@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Department Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>{{ dept_name }} Portal</h1>
+    <div>
+        <span class="status-badge {% if is_active %}status-active{% else %}status-inactive{% endif %}">
+            Election: {{ 'Active' if is_active else 'Inactive' }}
+        </span>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="glass-card">
+        <h2 class="card-title">Register Student</h2>
+        {% if is_active %}
+            <p style="color: #ff7b72; font-size: 0.9rem; margin-bottom: 1rem;">Cannot register students while election is active.</p>
+        {% endif %}
+        <form method="POST" action="{{ url_for('register_student') }}">
+            <div class="form-group">
+                <label for="student_name">Student Name</label>
+                <input type="text" id="student_name" name="student_name" class="form-control" required {% if is_active %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label for="student_email">Student Email</label>
+                <input type="email" id="student_email" name="student_email" class="form-control" required {% if is_active %}disabled{% endif %}>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" {% if is_active %}disabled{% endif %}>Register Student</button>
+        </form>
+    </div>
+
+    <!-- Register Candidate -->
+    <div class="glass-card">
+        <h2 class="card-title">Register Candidate</h2>
+        {% if is_active %}
+            <p style="color: #ff7b72; font-size: 0.9rem; margin-bottom: 1rem;">Cannot register candidates while election is active.</p>
+        {% endif %}
+        <form method="POST" action="{{ url_for('register_candidate') }}">
+            <div class="form-group">
+                <label for="candidate_name">Candidate Name</label>
+                <input type="text" id="candidate_name" name="candidate_name" class="form-control" required {% if is_active %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender (Boy / Girl)</label>
+                <select id="gender" name="gender" class="form-control" required {% if is_active %}disabled{% endif %} style="background: #0d1117; color: white;">
+                    <option value="Boy">Boy</option>
+                    <option value="Girl">Girl</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" {% if is_active %}disabled{% endif %}>Register Candidate</button>
+        </form>
+    </div>
+
+    <!-- Tokens Generation -->
+    <div class="glass-card">
+        <h2 class="card-title">Voting Tokens</h2>
+        <p style="color: #8b949e; margin-bottom: 1rem;">Generate unique one-time voting tokens for all registered students and send them via email.</p>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <p><strong>Total Students:</strong> {{ stats.students }}</p>
+            <p><strong>Tokens Generated:</strong> {{ stats.tokens }}</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('generate_tokens') }}">
+            <button type="submit" class="btn btn-primary btn-block" {% if is_active %}disabled{% endif %}>Generate & Send Tokens via Email</button>
+        </form>
+        {% if is_active %}
+            <p style="color: #ff7b72; font-size: 0.85rem; margin-top: 0.5rem; text-align: center;">Tokens cannot be generated while election is active.</p>
+        {% endif %}
+    </div>
+
+    <!-- Results Overview -->
+    <div class="glass-card" style="grid-column: 1 / -1;">
+        <h2 class="card-title">Department Election Results</h2>
+        {% if is_active %}
+            <p style="color: #8b949e; text-align: center; padding: 2rem 0;">Results are hidden while the election is active.</p>
+        {% else %}
+            <!-- Results Table -->
+            <table class="styled-table" style="margin-bottom: 2rem;">
+                <thead>
+                    <tr>
+                        <th>Candidate Name</th>
+                        <th>Gender</th>
+                        <th>Total Votes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in results %}
+                    <tr>
+                        <td>{{ c.name }}</td>
+                        <td>{{ c.gender }}</td>
+                        <td style="font-weight: bold; color: white;">{{ c.votes }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No candidates registered or no votes cast.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

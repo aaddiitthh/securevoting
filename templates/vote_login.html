@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Voter Authentication{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-form glass-card">
+        <h2>Enter Voting Token</h2>
+        <p style="color: #8b949e; margin-bottom: 1.5rem; text-align: center; font-size: 0.9rem;">
+            Please enter the unique one-time token you received via email to access your voting ballot.
+        </p>
+        <form method="POST" action="{{ url_for('vote_login') }}">
+            <div class="form-group">
+                <label for="token">Your Secure Token</label>
+                <input type="text" id="token" name="token" class="form-control" required autocomplete="off" style="text-align: center; font-size: 1.2rem; letter-spacing: 2px;">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-large">Access Ballot</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

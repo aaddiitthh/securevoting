@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Secure Voting{% endblock %} | College Voting System</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav class="glass-nav">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="logo">SecureVote</a>
+            <div class="nav-links">
+                {% if session.get('admin_logged_in') %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="nav-btn">Admin Dashboard</a>
+                    <a href="{{ url_for('admin_logout') }}" class="nav-btn btn-danger">Logout</a>
+                {% elif session.get('dept_logged_in') %}
+                    <a href="{{ url_for('dept_dashboard') }}" class="nav-btn">Dept Dashboard</a>
+                    <a href="{{ url_for('dept_logout') }}" class="nav-btn btn-danger">Logout</a>
+                {% elif session.get('student_logged_in') %}
+                    <a href="{{ url_for('vote_logout') }}" class="nav-btn btn-danger">Quit Voting Session</a>
+                {% else %}
+                    <a href="{{ url_for('vote_login') }}" class="nav-btn btn-primary">Vote Now</a>
+                    <a href="{{ url_for('dept_login') }}" class="nav-btn">Tutor Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

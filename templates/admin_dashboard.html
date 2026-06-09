@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Main Admin Dashboard</h1>
+    <div>
+        <span class="status-badge {% if is_active %}status-active{% else %}status-inactive{% endif %}">
+            Election: {{ 'Active' if is_active else 'Inactive' }}
+        </span>
+        <form method="POST" action="{{ url_for('toggle_election') }}" style="display:inline; margin-left: 1rem;">
+            <button type="submit" class="btn {% if is_active %}btn-danger{% else %}btn-success{% endif %}">
+                {{ 'End Election' if is_active else 'Start Election' }}
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Department Management -->
+    <div class="glass-card">
+        <h2 class="card-title">Register New Department Tutor</h2>
+        <form method="POST" action="{{ url_for('create_dept') }}">
+            <div class="form-group">
+                <label for="dept_name">Department Name (e.g., IT 1st Year)</label>
+                <input type="text" id="dept_name" name="dept_name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="dept_code">Login Code (e.g., it001)</label>
+                <input type="text" id="dept_code" name="dept_code" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Create Tutor Account</button>
+        </form>
+    </div>
+
+    <!-- Departments List -->
+    <div class="glass-card">
+        <h2 class="card-title">Registered Departments</h2>
+        {% if departments %}
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dept in departments %}
+                    <tr>
+                        <td>{{ dept.dept_code }}</td>
+                        <td>{{ dept.dept_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="color: #8b949e; text-align: center; padding: 2rem 0;">No departments registered yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Overall Results (Only visible if election ended) -->
+    <div class="glass-card" style="grid-column: 1 / -1;">
+        <h2 class="card-title">Overall Election Results</h2>
+        {% if is_active %}
+            <p style="color: #8b949e; text-align: center; padding: 2rem 0;">Results are hidden while the election is active.</p>
+        {% else %}
+            <!-- Results Table -->
+            <table class="styled-table" style="margin-bottom: 2rem;">
+                <thead>
+                    <tr>
+                        <th>Candidate Name</th>
+                        <th>Department</th>
+                        <th>Gender</th>
+                        <th>Total Votes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in results %}
+                    <tr>
+                        <td>{{ c.name }}</td>
+                        <td>{{ c.dept_name }}</td>
+                        <td>{{ c.gender }}</td>
+                        <td style="font-weight: bold; color: white;">{{ c.votes }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if winners.boy or winners.girl %}
+            <div style="display: flex; gap: 2rem; justify-content: center;">
+                <div class="stat-card" style="background: rgba(88, 166, 255, 0.1); border: 1px solid var(--primary); border-radius: 12px; width: 100%;">
+                    <h3 style="color: var(--primary);">Winner (Boy)</h3>
+                    {% if winners.boy %}
+                        <div class="stat-value">{{ winners.boy.name }}</div>
+                        <p>{{ winners.boy.votes }} Votes ({{ winners.boy.dept_name }})</p>
+                    {% else %}
+                        <p>No votes yet.</p>
+                    {% endif %}
+                </div>
+                <div class="stat-card" style="background: rgba(248, 81, 73, 0.1); border: 1px solid var(--danger); border-radius: 12px; width: 100%;">
+                    <h3 style="color: var(--danger);">Winner (Girl)</h3>
+                    {% if winners.girl %}
+                        <div class="stat-value">{{ winners.girl.name }}</div>
+                        <p>{{ winners.girl.votes }} Votes ({{ winners.girl.dept_name }})</p>
+                    {% else %}
+                        <p>No votes yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
